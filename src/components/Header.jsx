@@ -1,16 +1,16 @@
-import React, { useContext, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { isUserLoggedIn, logoutUser } from '../services/AuthService'
-import { AuthContext } from '../context/AuthContext.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import { removeUser } from '../redux/todosSlice.js'
 
 const Header = () => {
 
   const navigate = useNavigate()
 
-  const {authenticatedUser, removeUser} = useContext(AuthContext)
+  const authenticatedUser = useSelector(state => state.todos.authenticatedUser)
+  const dispatch = useDispatch()
 
   const handleLogoutClick = () => {
-    removeUser()
+    dispatch(removeUser())
     navigate('/login')
   }
 

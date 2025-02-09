@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
-import { AuthContext } from '../context/AuthContext.jsx'
 import { Navigate, Outlet } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const AuthenticatedRoute = () => {
-  const {authenticatedUser} = useContext(AuthContext)
+  console.log('AuthenticatedRoute rendered')
+  const authenticatedUser = useSelector(state => state.todos.authenticatedUser)
     if(authenticatedUser) {
       return <Outlet />
     }

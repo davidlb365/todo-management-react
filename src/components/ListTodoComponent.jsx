@@ -1,75 +1,31 @@
-import React, { useContext, useState } from 'react'
 import { useEffect } from 'react'
 import { completeTodoAPI, deleteTodoAPI, getAllTodosAPI, incompleteTodoAPI } from '../services/TodoService'
 import { useNavigate } from 'react-router-dom'
-import { isAdmin } from '../services/AuthService'
-import { AuthContext } from '../context/AuthContext.jsx'
 import { useDispatch, useSelector } from 'react-redux'
-import { completeTodo, deleteTodo, incompleteTodo, loadTodos } from '../redux/todosSlice.js'
-// import { SpinContext } from '../context/SpinProvider.jsx'
-import { SpinContext } from '../context/SpinContext.js'
+import { completeTodo, deleteTodo, incompleteTodo, loadTodos, startLoading, stopLoading } from '../redux/todosSlice.js'
 
 const ListTodoComponent = () => {
 
   console.log('ListTodoComponent rendered')
 
-  // const dummyData = [
-  //   {
-  //     id: 1,
-  //     title: 'Todo 1',
-  //     description: 'Description 1',
-  //     completed: false
-  //   },
-  //   {
-  //     id: 2,
-  //     title: 'Todo 2',
-  //     description: 'Description 2',
-  //     completed: false
-  //   },
-  //   {
-  //     id: 3,
-  //     title: 'Todo 3',
-  //     description: 'Description 3',
-  //     completed: false
-  //   }
-  // ]
-
   const todos = useSelector(state => state.todos.todos)
+  const role = useSelector(state => state.todos.role)
   const dispatch = useDispatch()
-
-  const {role} = useContext(AuthContext)
-  const {startLoading, stopLoading} = useContext(SpinContext)
 
   const navigate = useNavigate()
 
   const isUserAdmin = role && role === 'ROLE_ADMIN'
 
   useEffect(() => {
-    console.log('ListTodoComponent mounted')
-    // const getTodos = async () => {
-    //   try {
-    //     startLoading()
-    //     const {data} = await getAllTodosAPI()
-    //     dispatch(loadTodos(data))
-    //   } catch (error) {
-    //     console.error(error)
-    //   } finally {
-    //     stopLoading()
-    //   }
-    // }
 
-    // getTodos()
-
-    startLoading()
-    getAllTodosAPI()
-      .then(({data}) => {
-        dispatch(loadTodos(data))
-      })
-      .catch(error => console.error(error))
-      .finally(() => stopLoading())
-
-    return () => {
-      console.log('ListTodoComponent unmounted')
+    if(!todos.length) {
+      dispatch(startLoading())
+      getAllTodosAPI()
+        .then(({data}) => {
+          dispatch(loadTodos(data))
+        })
+        .catch(error => console.error(error))
+        .finally(() => dispatch(stopLoading()))
     }
   }, [])
   
@@ -83,38 +39,38 @@ const ListTodoComponent = () => {
 
   const handleDeleteTodo = async id => {
     try {
-      startLoading()
+      dispatch(startLoading())
       const {data} = await deleteTodoAPI(id)
       dispatch(deleteTodo({id}))
     } catch (error) {
       console.error(error)
     }
     finally {
-      stopLoading()
+      dispatch(stopLoading())
     }
   }
 
   const handleCompleteTodo = async id => {
     try {
-      startLoading()
+      dispatch(startLoading())
       const {data} = await completeTodoAPI(id)
       dispatch(completeTodo({id}))
     } catch (error) {
       console.error(error)
     } finally {
-      stopLoading()
+      dispatch(stopLoading())
     }
   }
 
   const handleIncompleteTodo = async id => {
     try {
-      startLoading()
+      dispatch(startLoading())
       const {data} = await incompleteTodoAPI(id)
       dispatch(incompleteTodo({id}))
     } catch (error) {
       console.error(error)
     } finally {
-      stopLoading()
+      dispatch(stopLoading())
     }
   }
 

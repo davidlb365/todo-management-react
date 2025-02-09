@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { addTodoAPI, updateTodoAPI } from '../services/TodoService'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { addTodo, startLoading, stopLoading, updateTodo } from '../redux/todosSlice.js'
 
 const TodoComponent = () => {
 
   const {id} = useParams()
+
   const todo = useSelector(state => state.todos.todos)?.find(todo => todo.id === parseInt(id))
-  console.log(todo)
+  const dispatch = useDispatch()
+
   const [title, setTitle] = useState(() => todo ? todo.title : '')
   const [description, setDescription] = useState(() => todo ? todo.description : '')
   const [completed, setCompleted] = useState(() => todo ? todo.completed : false)
@@ -18,25 +21,7 @@ const TodoComponent = () => {
 
   const navigate = useNavigate()
 
-  // const getTodoInfo = async () => {
-  //   try {
-  //     const {data} = await getTodo(id)
-  //     setTitle(data.title)
-  //     setDescription(data.description)
-  //     setCompleted(data.completed)
-  //   } catch (error) {
-  //     console.error(error)
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   if(id) {
-  //     getTodoInfo()
-  //   }
-  // }, [])
-
   const validateForm = () => {
-    const {titleError, descriptionError} = errors
     if(![title, description].includes('')) {
       return true;
     }
@@ -52,18 +37,25 @@ const TodoComponent = () => {
   }
 
   const handleSubmit = async e => {
+    dispatch(startLoading())
     e.preventDefault()
     if(validateForm()) {
       try {
+        dispatch(startLoading())
         if(id) {
           const {data} = await updateTodoAPI(id, {title, description, completed})
+          dispatch(updateTodo({id, updatedTodo: data}))
         }
         else {
           const {data} = await addTodoAPI({title, description, completed})
+          dispatch(addTodo({addedTodo: data}))
         }
         navigate("/todos")
       } catch (error) {
         console.error(error)
+      }
+      finally {
+        dispatch(stopLoading())
       }
     }
   }

@@ -1,31 +1,33 @@
-import React, { useContext, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login, saveLoggedInUser } from '../services/AuthService'
-import { AuthContext } from '../context/AuthContext.jsx'
+import { login } from '../services/AuthService'
+import { useDispatch } from 'react-redux'
+import { startLoading, stopLoading, storeToken, storeUserInfo } from '../redux/todosSlice.js'
 
 const LoginComponent = () => {
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const {storeToken, storeUserInfo} = useContext(AuthContext)
+  const dispatch = useDispatch()
 
   const navigate = useNavigate()
 
   const handleSubmit = async e => {
     e.preventDefault()
     try {
+      dispatch(startLoading())
       const {data} = await login({usernameOrEmail: username, password})
-      const token = data?.tokenType + ' ' + data?.accessToken   // converts string to base64
+      const token = data?.tokenType + ' ' + data?.accessToken
       if(!token) return
-      console.log()
-      storeToken(token)
+      dispatch(storeToken({token}))
       const role = data?.role
-      storeUserInfo(username, role)
+      dispatch(storeUserInfo({username, role}))
       navigate('/todos')
-      window.location.reload()
     } catch (error) {
       console.error(error)
+    } finally {
+      dispatch(stopLoading())
     }
   }
 
