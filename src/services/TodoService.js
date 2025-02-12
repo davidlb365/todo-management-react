@@ -1,19 +1,24 @@
 import axios from "axios"
-import { getToken } from "./AuthService";
+// import store from "../redux/store.js";
+// import store from "../redux/store.js";
 
 const VITE_BASE_TODOS_URL = import.meta.env.VITE_BASE_TODOS_URL
 
-axios.interceptors.request.use(function (config) {
-  // Do something before request is sent
-  const token = getToken()
-  if(token) {
-    config.headers['Authorization'] = token
-  }
-  return config;
-}, function (error) {
-  // Do something with request error
-  return Promise.reject(error);
-});
+// export const axiosInterceptors = () => {
+//   axios.interceptors.request.use(function (config) {
+//   // Do something before request is sent
+//   const token = store.getState().todos.authToken
+//   // const token = authToken
+//   // console.log(token)
+//   if(token) {
+//     config.headers['Authorization'] = token
+//   }
+//   return config;
+//   }, function (error) {
+//     // Do something with request error
+//     return Promise.reject(error);
+//   })
+// }
 
 export const getAllTodosAPI = () => {
   return axios(VITE_BASE_TODOS_URL)
@@ -23,7 +28,7 @@ export const addTodoAPI = todo => {
   return axios.post(VITE_BASE_TODOS_URL, todo)
 }
 
-export const getTodo = id => {
+export const getTodoAPI = id => {
   return axios(`${VITE_BASE_TODOS_URL}/${id}`)
 }
 

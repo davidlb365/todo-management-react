@@ -2,7 +2,6 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const AuthenticatedRoute = () => {
-  console.log('AuthenticatedRoute rendered')
   const authenticatedUser = useSelector(state => state.todos.authenticatedUser)
     if(authenticatedUser) {
       return <Outlet />

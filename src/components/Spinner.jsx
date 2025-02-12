@@ -3,7 +3,7 @@ import '../Spinner.css'
 
 const Spinner = () => {
   const loading = useSelector(state => state.todos.loading)
-  console.log(loading)
+  // console.log(loading)
   return (
     <>
     {loading &&

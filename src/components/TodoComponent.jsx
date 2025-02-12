@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { addTodoAPI, updateTodoAPI } from '../services/TodoService'
+// import { addTodoAPI, updateTodoAPI } from '../services/TodoService'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addTodo, startLoading, stopLoading, updateTodo } from '../redux/todosSlice.js'
+import { addTodoThunk,  updateTodoThunk } from '../redux/todosSlice.js'
 
 const TodoComponent = () => {
 
@@ -37,25 +37,17 @@ const TodoComponent = () => {
   }
 
   const handleSubmit = async e => {
-    dispatch(startLoading())
     e.preventDefault()
     if(validateForm()) {
       try {
-        dispatch(startLoading())
         if(id) {
-          const {data} = await updateTodoAPI(id, {title, description, completed})
-          dispatch(updateTodo({id, updatedTodo: data}))
+          await dispatch(updateTodoThunk({id, todo: {title, description, completed}}))
         }
         else {
-          const {data} = await addTodoAPI({title, description, completed})
-          dispatch(addTodo({addedTodo: data}))
+          await dispatch(addTodoThunk({title, description, completed}))
         }
         navigate("/todos")
-      } catch (error) {
-        console.error(error)
-      }
-      finally {
-        dispatch(stopLoading())
+      } catch (e) {
       }
     }
   }

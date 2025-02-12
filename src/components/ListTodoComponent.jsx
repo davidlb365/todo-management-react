@@ -1,12 +1,9 @@
 import { useEffect } from 'react'
-import { completeTodoAPI, deleteTodoAPI, getAllTodosAPI, incompleteTodoAPI } from '../services/TodoService'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { completeTodo, deleteTodo, incompleteTodo, loadTodos, startLoading, stopLoading } from '../redux/todosSlice.js'
+import { completeTodoThunk, deleteTodoThunk, incompleteTodoThunk, loadTodosThunk } from '../redux/todosSlice.js'
 
 const ListTodoComponent = () => {
-
-  console.log('ListTodoComponent rendered')
 
   const todos = useSelector(state => state.todos.todos)
   const role = useSelector(state => state.todos.role)
@@ -17,16 +14,7 @@ const ListTodoComponent = () => {
   const isUserAdmin = role && role === 'ROLE_ADMIN'
 
   useEffect(() => {
-
-    if(!todos.length) {
-      dispatch(startLoading())
-      getAllTodosAPI()
-        .then(({data}) => {
-          dispatch(loadTodos(data))
-        })
-        .catch(error => console.error(error))
-        .finally(() => dispatch(stopLoading()))
-    }
+    if(!todos.length) dispatch(loadTodosThunk())
   }, [])
   
   const handleAddTodo = () => {
@@ -38,40 +26,15 @@ const ListTodoComponent = () => {
   }
 
   const handleDeleteTodo = async id => {
-    try {
-      dispatch(startLoading())
-      const {data} = await deleteTodoAPI(id)
-      dispatch(deleteTodo({id}))
-    } catch (error) {
-      console.error(error)
-    }
-    finally {
-      dispatch(stopLoading())
-    }
+    dispatch(deleteTodoThunk(id))
   }
 
-  const handleCompleteTodo = async id => {
-    try {
-      dispatch(startLoading())
-      const {data} = await completeTodoAPI(id)
-      dispatch(completeTodo({id}))
-    } catch (error) {
-      console.error(error)
-    } finally {
-      dispatch(stopLoading())
-    }
+  const handleCompleteTodo = id => {
+    dispatch(completeTodoThunk(id))
   }
 
   const handleIncompleteTodo = async id => {
-    try {
-      dispatch(startLoading())
-      const {data} = await incompleteTodoAPI(id)
-      dispatch(incompleteTodo({id}))
-    } catch (error) {
-      console.error(error)
-    } finally {
-      dispatch(stopLoading())
-    }
+    dispatch(incompleteTodoThunk(id))
   }
 
   return (

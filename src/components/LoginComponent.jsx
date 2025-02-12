@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../services/AuthService'
 import { useDispatch } from 'react-redux'
-import { startLoading, stopLoading, storeToken, storeUserInfo } from '../redux/todosSlice.js'
+import { loginThunk } from '../redux/todosSlice.js'
 
 const LoginComponent = () => {
 
@@ -15,20 +14,8 @@ const LoginComponent = () => {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    try {
-      dispatch(startLoading())
-      const {data} = await login({usernameOrEmail: username, password})
-      const token = data?.tokenType + ' ' + data?.accessToken
-      if(!token) return
-      dispatch(storeToken({token}))
-      const role = data?.role
-      dispatch(storeUserInfo({username, role}))
-      navigate('/todos')
-    } catch (error) {
-      console.error(error)
-    } finally {
-      dispatch(stopLoading())
-    }
+    dispatch(loginThunk({username, password}))
+      .then(() => navigate('/todos'))
   }
 
   return (

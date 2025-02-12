@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { register } from '../services/AuthService'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { registerThunk } from '../redux/todosSlice.js'
 
 const RegisterComponent = () => {
 
@@ -9,15 +10,14 @@ const RegisterComponent = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const dispatch = useDispatch()
+
+  const navigate = useNavigate()
+
   const handleSubmit = async e => {
     e.preventDefault()
-    try {
-      const {data} = await register({name, username, email, password})
-      console.log(data)
-    } catch (error) {
-      console.error(error)
-    }
-    // console.log({name, username, email, password})
+    dispatch(registerThunk({name, username, email, password}))
+      .then(() => navigate('/login'))
   }
 
   return (
