@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { registerThunk } from '../redux/todosSlice.js'
+import { useRegisterMutation } from '../services/api.js'
+import Spinner from './Spinner.jsx'
 
 const RegisterComponent = () => {
 
@@ -10,15 +10,26 @@ const RegisterComponent = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const dispatch = useDispatch()
+  const [register, {data, isLoading, isSuccess, isError, error}] = useRegisterMutation()
 
   const navigate = useNavigate()
 
-  const handleSubmit = async e => {
+  const handleSubmit = e => {
     e.preventDefault()
-    dispatch(registerThunk({name, username, email, password}))
-      .then(() => navigate('/login'))
+    register({name, username, email, password}).unwrap()
+      .then(() => {
+        setTimeout(() => {
+          navigate('/login')
+        }, 3000);
+      })
+      .catch(error => console.log(error))
+    // dispatch(registerThunk({name, username, email, password}))
+    //   .then(() => navigate('/login'))
   }
+
+  if(isLoading) return (
+    <Spinner />
+  )
 
   return (
     <div className='container'>
@@ -59,6 +70,8 @@ const RegisterComponent = () => {
                   <p className='mb-0'>Already registered? <Link to='/login'>login here</Link></p>
                 </div>
               </form>
+              {isSuccess && <p className='alert alert-success'>{data?.message}</p>}
+              {isError && <p className='alert alert-danger'>{error.data.message}</p>}
             </div>
           </div>
         </div>

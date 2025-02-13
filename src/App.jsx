@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import TodoComponent from './components/TodoComponent'
 import RegisterComponent from './components/RegisterComponent'
 import LoginComponent from './components/LoginComponent'
-import Spinner from './components/Spinner.jsx'
+// import Spinner from './components/Spinner.jsx'
 import AuthenticatedRoute from './components/AuthenticatedRoute.jsx'
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
           </Routes>
           <Footer />
         </BrowserRouter>
-        <Spinner />
+        {/* <Spinner /> */}
     </>
   )
 }
