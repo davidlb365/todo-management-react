@@ -1,45 +1,45 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../redux/store.ts";
 
-export interface RegisterParameters {
+interface RegisterParameters {
   name: string,
   username: string,
   email: string,
   password: string
 }
 
-export interface RegisterResponse {
+interface RegisterResponse {
   message: string
 }
 
-export interface LoginParameters {
+interface LoginParameters {
   usernameOrEmail: string,
   password: string
 }
 
-export interface LoginResponse {
+interface LoginResponse {
   accessToken: string,
   tokenType: string,
   role: string
 }
 
-export interface LoginTransformResponse {
+interface LoginTransformResponse {
   data: LoginResponse,
   username: string
 }
 
-export interface UpdateParameters {
+interface UpdateParameters {
   id: number,
   todo: Todo
 }
 
-export interface Todo {
+interface Todo {
   title: string,
   description: string,
   completed: boolean
 }
 
-export interface TodoComplete extends Todo {
+interface TodoComplete extends Todo {
   id: number
 }
 
