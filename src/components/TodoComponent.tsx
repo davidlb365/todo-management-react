@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAddTodoMutation, useGetAllTodosQuery, useUpdateTodoMutation } from '../services/api.js'
-import Spinner from './Spinner.jsx'
+import { useAddTodoMutation, useGetAllTodosQuery, useUpdateTodoMutation } from '../services/api.ts'
+import Spinner from './Spinner'
 
 const TodoComponent = () => {
 
@@ -11,7 +11,7 @@ const TodoComponent = () => {
   const [addTodo, {isLoading: isLoadingAdd}] = useAddTodoMutation()
   const [updateTodo, {isLoading: isLoadingUpdate}] = useUpdateTodoMutation()
 
-  const todo = todos?.find(todo => todo.id === parseInt(id))
+  const todo = todos?.find(todo => id ? todo.id === parseInt(id) : false)
 
   const [title, setTitle] = useState(() => todo ? todo.title : '')
   const [description, setDescription] = useState(() => todo ? todo.description : '')
@@ -38,12 +38,12 @@ const TodoComponent = () => {
     return false
   }
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if(validateForm()) {
       try {
         if(id) {
-          await updateTodo({id, todo: {title, description, completed}}).unwrap()
+          await updateTodo({id: parseInt(id), todo: {title, description, completed}}).unwrap()
         }
         else {
           await addTodo({title, description, completed}).unwrap()
@@ -51,6 +51,7 @@ const TodoComponent = () => {
 
         navigate("/todos")
       } catch (e) {
+        console.error(e)
       }
     }
   }
@@ -62,7 +63,7 @@ const TodoComponent = () => {
           <div className='card col-md-6'>
             <h2 className='text-center'>{id ? 'Update' : 'Add'} Todo</h2>
             <div className='card-body'>
-              <form>
+              <form onSubmit={e => handleSubmit(e)}>
                 <div className="form-group mb-2">
                   <label htmlFor="title" className="form-label">Todo Title</label>
                   <input type="text" className='form-control' name='title' placeholder='Enter Todo Title' value={title} onChange={e => setTitle(e.target.value)} />
@@ -75,12 +76,12 @@ const TodoComponent = () => {
                 { errors.descriptionError && <p className='text-danger'>{errors.descriptionError}</p> }
                 <div className="form-group mb-2">
                   <label htmlFor="completed" className="form-label">Todo Completed</label>
-                  <select className='form-control' name="completed" id="completed" value={completed} onChange={e => setCompleted(e.target.value)}>
+                  <select className='form-control' name="completed" id="completed" value={completed.toString()} onChange={e => setCompleted(e.target.value === 'true')}>
                     <option value="false">No</option>
                     <option value="true">Yes</option>
                   </select>
                 </div>
-                <button type="submit" className='btn btn-success' onClick={handleSubmit}>Submit</button>
+                <button type="submit" className='btn btn-success'>Submit</button>
               </form>
             </div>
           </div>

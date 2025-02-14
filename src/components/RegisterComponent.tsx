@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useRegisterMutation } from '../services/api.js'
-import Spinner from './Spinner.jsx'
+import { useRegisterMutation } from '../services/api.ts'
+import Spinner from './Spinner'
+import { ErrorData } from '../types/error.ts'
 
 const RegisterComponent = () => {
 
@@ -14,7 +15,7 @@ const RegisterComponent = () => {
 
   const navigate = useNavigate()
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     register({name, username, email, password}).unwrap()
       .then(() => {
@@ -23,8 +24,6 @@ const RegisterComponent = () => {
         }, 3000);
       })
       .catch(error => console.log(error))
-    // dispatch(registerThunk({name, username, email, password}))
-    //   .then(() => navigate('/login'))
   }
 
   if(isLoading) return (
@@ -40,7 +39,7 @@ const RegisterComponent = () => {
               <h2 className='text-center'>Registration Form</h2>
             </div>
             <div className='card-body'>
-              <form>
+              <form onSubmit={e => handleSubmit(e)}>
                 <div className='row align-items-center mb-3'>
                   <label className='form-label col-md-3 mb-0'>Name</label>
                   <div className="col-md-9">
@@ -66,12 +65,12 @@ const RegisterComponent = () => {
                   </div>
                 </div>
                 <div className='form-group mb-3 d-flex align-items-center gap-2'>
-                  <button type='submit' className='btn btn-primary' onClick={handleSubmit}>Submit</button>
+                  <button type='submit' className='btn btn-primary'>Submit</button>
                   <p className='mb-0'>Already registered? <Link to='/login'>login here</Link></p>
                 </div>
               </form>
               {isSuccess && <p className='alert alert-success'>{data?.message}</p>}
-              {isError && <p className='alert alert-danger'>{error.data.message}</p>}
+              {isError && ('data' in error) && <p className='alert alert-danger'>{(error.data as ErrorData).message}</p>}
             </div>
           </div>
         </div>

@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { useGetAllTodosQuery, useDeleteTodoMutation, useCompleteTodoMutation, useIncompleteTodoMutation } from '../services/api.js'
-import Spinner from './Spinner.jsx'
+import { useGetAllTodosQuery, useDeleteTodoMutation, useCompleteTodoMutation, useIncompleteTodoMutation } from '../services/api.ts'
+import Spinner from './Spinner'
+import { RootState } from '../redux/store.ts'
 
 const ListTodoComponent = () => {
 
-  const role = useSelector(state => state.todos.role)
+  const role = useSelector((state: RootState) => state.todos.role)
 
   const {data: todos = [], isFetching,} = useGetAllTodosQuery()
 
@@ -22,19 +23,19 @@ const ListTodoComponent = () => {
     navigate("/add-todo")
   }
 
-  const handleUpdateTodo = id => {
+  const handleUpdateTodo = (id: number) => {
     navigate(`/update-todo/${id}`)
   }
 
-  const handleDeleteTodo = id => {
+  const handleDeleteTodo = (id: number) => {
     deleteTodo(id)
   }
 
-  const handleCompleteTodo = id => {
+  const handleCompleteTodo = (id: number) => {
     completeTodo(id)
   }
 
-  const handleIncompleteTodo = id => {
+  const handleIncompleteTodo = (id: number) => {
     incompleteTodo(id)
   }
 

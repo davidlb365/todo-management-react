@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useLoginMutation } from '../services/api.js'
-import Spinner from './Spinner.jsx'
+import { useLoginMutation } from '../services/api.ts'
+import Spinner from './Spinner'
+import { ErrorData } from '../types/error.ts'
 
 const LoginComponent = () => {
 
@@ -12,7 +13,7 @@ const LoginComponent = () => {
 
   const [login, {isLoading, isSuccess, isError, error}] = useLoginMutation()
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     login({usernameOrEmail: username, password}).unwrap()
       .then(() => {
@@ -34,7 +35,7 @@ const LoginComponent = () => {
               <h2 className='text-center'>Login Form</h2>
             </div>
             <div className='card-body'>
-              <form>
+              <form onSubmit={e => handleSubmit(e)}>
                 <div className='row align-items-center mb-3'>
                   <label className='form-label col-md-3 mb-0'>Username</label>
                   <div className="col-md-9">
@@ -48,12 +49,12 @@ const LoginComponent = () => {
                   </div>
                 </div>
                 <div className='form-group mb-3 d-flex align-items-center gap-2'>
-                  <button type='submit' className='btn btn-primary' onClick={handleSubmit}>Submit</button>
+                  <button type='submit' className='btn btn-primary'>Submit</button>
                   <p className='mb-0'>Not registered? <Link to='/register'>register here</Link></p>
                 </div>
               </form>
               {isSuccess && <p className='alert alert-success'>You have logged in successfully</p> }
-              {isError && <p className='alert alert-danger'>{error?.data.message}</p>}
+              {isError && ('data' in error) && <p className='alert alert-danger'>{(error.data as ErrorData).message}</p>}
             </div>
           </div>
         </div>

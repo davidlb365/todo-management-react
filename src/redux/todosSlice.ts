@@ -1,14 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { apiSlice } from "../services/api.js";
+import { apiSlice } from "../services/api.ts";
+
+export interface TodosState {
+  authToken: string | null,
+  authenticatedUser: string | null,
+  role: string | null
+}
+
+const initialState: TodosState = {
+  authToken: localStorage.getItem('token'),
+  authenticatedUser: localStorage.getItem('authenticatedUser'),
+  role: localStorage.getItem('role'),
+}
 
 export const todosSlice = createSlice({
   name: 'todos',
-  initialState: {
-    authToken: localStorage.getItem('token'),
-    authenticatedUser: localStorage.getItem('authenticatedUser'),
-    role: localStorage.getItem('role'),
-  },
-
+  initialState,
   reducers: {
     removeUser: (state) => {
       state.authToken = null
@@ -36,6 +43,6 @@ export const todosSlice = createSlice({
   }
 })
 
-export const { removeTodos, storeToken, storeUserInfo, removeUser, startLoading, stopLoading} = todosSlice.actions
+export const { removeUser } = todosSlice.actions
 
 export default todosSlice.reducer

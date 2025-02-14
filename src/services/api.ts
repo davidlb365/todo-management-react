@@ -1,4 +1,47 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { RootState } from "../redux/store.ts";
+
+export interface RegisterParameters {
+  name: string,
+  username: string,
+  email: string,
+  password: string
+}
+
+export interface RegisterResponse {
+  message: string
+}
+
+export interface LoginParameters {
+  usernameOrEmail: string,
+  password: string
+}
+
+export interface LoginResponse {
+  accessToken: string,
+  tokenType: string,
+  role: string
+}
+
+export interface LoginTransformResponse {
+  data: LoginResponse,
+  username: string
+}
+
+export interface UpdateParameters {
+  id: number,
+  todo: Todo
+}
+
+export interface Todo {
+  title: string,
+  description: string,
+  completed: boolean
+}
+
+export interface TodoComplete extends Todo {
+  id: number
+}
 
 export const apiSlice = createApi({
   reducerPath: 'api',
@@ -6,7 +49,7 @@ export const apiSlice = createApi({
     baseUrl: import.meta.env.VITE_BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       // By default, if we have a token in the store, let's use that for authenticated requests
-      const token = getState().todos.authToken
+      const token = (getState() as RootState).todos.authToken
       if (token) {
         headers.set('authorization', token)
       }
@@ -16,7 +59,7 @@ export const apiSlice = createApi({
   tagTypes: ['Todo'],
   endpoints: (builder) => ({
     // Auth
-    register: builder.mutation({
+    register: builder.mutation<RegisterResponse, RegisterParameters>({
         query: (credentials) => ({
           url: '/api/auth/register',
           method: 'POST',
@@ -24,13 +67,13 @@ export const apiSlice = createApi({
           // responseHandler: (response) => response.text(),
         })
     }),
-    login: builder.mutation({
+    login: builder.mutation<LoginTransformResponse, LoginParameters>({
       query: (credentials) => ({
         url: '/api/auth/login',
         method: 'POST',
         body: credentials
       }),
-      transformResponse: (response, meta, arg) => {
+      transformResponse: (response: LoginResponse, meta, arg) => {
         const data = response
         const {usernameOrEmail: username} = arg
         return {data, username}
@@ -38,13 +81,13 @@ export const apiSlice = createApi({
     }),
 
     // Todos
-    getAllTodos: builder.query({
+    getAllTodos: builder.query<TodoComplete[], void>({
       query: () => ({
         url: '/api/todos'
       }),
       providesTags: ['Todo']
     }),
-    addTodo: builder.mutation({
+    addTodo: builder.mutation<TodoComplete, Todo>({
       query: (todo) => ({
         url: '/api/todos',
         method: 'POST',
@@ -52,7 +95,7 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Todo']
     }),
-    updateTodo: builder.mutation({
+    updateTodo: builder.mutation<TodoComplete, UpdateParameters>({
       query: ({id, todo}) => ({
         url: `/api/todos/${id}`,
         method: 'PUT',
@@ -60,21 +103,21 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Todo']
     }),
-    deleteTodo: builder.mutation({
+    deleteTodo: builder.mutation<string, number>({
       query: (id) => ({
         url: `/api/todos/${id}`,
         method: 'DELETE'
       }),
       invalidatesTags: ['Todo']
     }),
-    completeTodo: builder.mutation({
+    completeTodo: builder.mutation<TodoComplete, number>({
       query: (id) => ({
         url: `/api/todos/${id}/complete`,
         method: 'PATCH'
       }),
       invalidatesTags: ['Todo']
     }),
-    incompleteTodo: builder.mutation({
+    incompleteTodo: builder.mutation<TodoComplete, number>({
       query: (id) => ({
         url: `/api/todos/${id}/incomplete`,
         method: 'PATCH'
