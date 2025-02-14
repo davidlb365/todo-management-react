@@ -2,8 +2,16 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { removeUser } from '../redux/todosSlice.ts'
 import { RootState } from '../redux/store.ts'
+import { useState } from 'react'
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
 
 const Header = () => {
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const navigate = useNavigate()
 
@@ -12,6 +20,7 @@ const Header = () => {
 
   const handleLogoutClick = () => {
     dispatch(removeUser())
+    setShow(false)
     navigate('/login')
   }
 
@@ -44,12 +53,26 @@ const Header = () => {
           }
           {authenticatedUser && 
             <li className='nav-item'>
-              <NavLink to={'/login'} className='nav-link' onClick={handleLogoutClick}>Logout</NavLink>
+              <button className='nav-link' onClick={handleShow}>Logout</button>
             </li>
           }
           </ul>
         </nav>
       </header>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Logout</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to logout?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="danger" onClick={handleLogoutClick}>
+            Logout
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   )
 }

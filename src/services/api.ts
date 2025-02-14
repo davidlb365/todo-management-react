@@ -23,7 +23,7 @@ interface LoginResponse {
   role: string
 }
 
-interface LoginTransformResponse {
+export interface LoginTransformResponse {
   data: LoginResponse,
   username: string
 }

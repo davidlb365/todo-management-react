@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useLoginMutation } from '../services/api.ts'
 import Spinner from './Spinner'
 import { ErrorData } from '../types/error.ts'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../redux/store.ts'
+import { loginUser } from '../redux/todosSlice.ts'
 
 const LoginComponent = () => {
 
@@ -11,16 +14,19 @@ const LoginComponent = () => {
 
   const navigate = useNavigate()
 
+  const dispatch: AppDispatch = useDispatch()
+
   const [login, {isLoading, isSuccess, isError, error}] = useLoginMutation()
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     login({usernameOrEmail: username, password}).unwrap()
-      .then(() => {
+      .then(res => {
         setTimeout(() => {
+          dispatch(loginUser(res))
           navigate('/todos')
-        }, 2000);
-      })
+        }, 2000)
+        })
       .catch(error => console.error(error))
   }
 
