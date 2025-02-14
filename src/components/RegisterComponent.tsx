@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { register } from '../services/AuthService'
+import { Link, useNavigate } from 'react-router-dom'
+import { useRegisterMutation } from '../services/api.ts'
+import Spinner from './Spinner'
+import { ErrorData } from '../types/error.ts'
 
 const RegisterComponent = () => {
 
@@ -9,16 +11,24 @@ const RegisterComponent = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSubmit = async e => {
+  const [register, {data, isLoading, isSuccess, isError, error}] = useRegisterMutation()
+
+  const navigate = useNavigate()
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    try {
-      const {data} = await register({name, username, email, password})
-      console.log(data)
-    } catch (error) {
-      console.error(error)
-    }
-    // console.log({name, username, email, password})
+    register({name, username, email, password}).unwrap()
+      .then(() => {
+        setTimeout(() => {
+          navigate('/login')
+        }, 3000);
+      })
+      .catch(error => console.log(error))
   }
+
+  if(isLoading) return (
+    <Spinner />
+  )
 
   return (
     <div className='container'>
@@ -29,7 +39,7 @@ const RegisterComponent = () => {
               <h2 className='text-center'>Registration Form</h2>
             </div>
             <div className='card-body'>
-              <form>
+              <form onSubmit={e => handleSubmit(e)}>
                 <div className='row align-items-center mb-3'>
                   <label className='form-label col-md-3 mb-0'>Name</label>
                   <div className="col-md-9">
@@ -55,10 +65,12 @@ const RegisterComponent = () => {
                   </div>
                 </div>
                 <div className='form-group mb-3 d-flex align-items-center gap-2'>
-                  <button type='submit' className='btn btn-primary' onClick={handleSubmit}>Submit</button>
+                  <button type='submit' className='btn btn-primary'>Submit</button>
                   <p className='mb-0'>Already registered? <Link to='/login'>login here</Link></p>
                 </div>
               </form>
+              {isSuccess && <p className='alert alert-success'>{data?.message}</p>}
+              {isError && ('data' in error) && <p className='alert alert-danger'>{(error.data as ErrorData).message}</p>}
             </div>
           </div>
         </div>

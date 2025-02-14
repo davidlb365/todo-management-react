@@ -1,12 +1,13 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { removeUser } from '../redux/todosSlice.js'
+import { removeUser } from '../redux/todosSlice.ts'
+import { RootState } from '../redux/store.ts'
 
 const Header = () => {
 
   const navigate = useNavigate()
 
-  const authenticatedUser = useSelector(state => state.todos.authenticatedUser)
+  const authenticatedUser = useSelector((state: RootState) => state.todos.authenticatedUser)
   const dispatch = useDispatch()
 
   const handleLogoutClick = () => {
